@@ -231,3 +231,4 @@ export function calculateFlames(name1: string, name2: string): FlamesData {
     quote: QUOTES[resultType][listIndex],
   };
 }
+
