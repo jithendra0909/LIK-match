@@ -3,7 +3,8 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Heart, Sparkles, Share2, RotateCcw, Star } from 'lucide-react';
+import { Heart, Sparkles, Share2, RotateCcw, Star, Download } from 'lucide-react';
+import { toPng } from 'html-to-image';
 import type { FlamesData } from '@/lib/flamesCalculator';
 
 export default function Home() {
@@ -12,8 +13,10 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FlamesData | null>(null);
   const [error, setError] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const resultRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
 
   const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +24,7 @@ export default function Home() {
       setError('Names must be at least 2 characters long.');
       return;
     }
-
+    
     setLoading(true);
     setError('');
     setResult(null);
@@ -52,10 +55,10 @@ export default function Home() {
   };
 
   const triggerConfetti = (resultType: string) => {
-    const colors = resultType === 'Love' || resultType === 'Marriage'
+    const colors = resultType === 'Love' || resultType === 'Marriage' 
       ? ['#e11d48', '#f43f5e', '#ffb3c6'] // Pinks/Reds
       : ['#3b82f6', '#10b981', '#f59e0b']; // Mixed
-
+    
     confetti({
       particleCount: 100,
       spread: 70,
@@ -66,9 +69,9 @@ export default function Home() {
 
   const handleShare = async () => {
     if (!result) return;
-
-    const text = `I got "${result.result}" for ${name1} & ${name2} on the LIK Match Checker! Our Love Meter is ${result.percentage}% ❤️ Check yours now!`;
-
+    
+    const text = `I got "${result.result}" for ${name1} & ${name2} on the LIK Match Checker! Our Love Meter is ${result.percentage}% ❤️ Check yours now! (Made by AI-1 Students)`;
+    
     if (navigator.share) {
       try {
         await navigator.share({
@@ -83,6 +86,34 @@ export default function Home() {
       // Fallback to clipboard
       navigator.clipboard.writeText(`${text} ${window.location.href}`);
       alert('Result copied to clipboard!');
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!exportRef.current) return;
+    
+    setIsDownloading(true);
+    try {
+      const dataUrl = await toPng(exportRef.current, {
+        quality: 0.95,
+        backgroundColor: '#ffffff',
+        style: {
+          padding: '2rem',
+          borderRadius: '2rem',
+          margin: '0',
+          boxShadow: 'none',
+        }
+      });
+      
+      const link = document.createElement('a');
+      link.download = `LIK-Match-${name1}-${name2}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Error downloading image:', err);
+      alert('Failed to download image. Please try again.');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -101,7 +132,7 @@ export default function Home() {
 
       <main className="max-w-4xl mx-auto px-4 pt-16 relative z-10">
         <header className="text-center mb-12">
-          <motion.div
+          <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, type: 'spring' }}
@@ -110,8 +141,8 @@ export default function Home() {
             <Sparkles className="text-orange-500 w-5 h-5" />
             <span className="font-semibold text-sm text-slate-700 tracking-wide uppercase">Relationship Destiny</span>
           </motion.div>
-
-          <motion.h1
+          
+          <motion.h1 
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -119,8 +150,8 @@ export default function Home() {
           >
             Check Your LIK Match
           </motion.h1>
-
-          <motion.p
+          
+          <motion.p 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -128,7 +159,7 @@ export default function Home() {
           >
             Enter two names to discover your fun relationship result. Are you destined for love, or just chaotic sibling energy?
           </motion.p>
-
+          
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -143,7 +174,7 @@ export default function Home() {
 
         <div className="max-w-xl mx-auto">
           {!result && (
-            <motion.div
+            <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -214,17 +245,18 @@ export default function Home() {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-orange-400 transform scale-[1.03] rounded-[2rem] blur-xl opacity-30 animate-pulse"></div>
                 <div className="glass-card rounded-[2rem] p-8 relative overflow-hidden bg-white/80">
-                  <div className="text-center mb-8">
+                  <div ref={exportRef} className="relative z-10 -m-8 p-8 pb-4 mb-4 md:m-0 md:p-0 md:pb-8 md:mb-8 md:bg-transparent">
+                    <div className="text-center mb-8">
                     <p className="text-slate-500 font-medium mb-2 uppercase tracking-widest text-sm">The Result is in</p>
                     <div className="flex items-center justify-center gap-4 text-2xl font-bold text-slate-800 mb-6">
                       <span className="capitalize">{name1}</span>
                       <Heart className="w-6 h-6 text-rose-500 fill-rose-500" />
                       <span className="capitalize">{name2}</span>
                     </div>
-
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                    
+                    <motion.div 
+                      initial={{ scale: 0 }} 
+                      animate={{ scale: 1 }} 
                       transition={{ delay: 0.3, type: 'spring' }}
                       className="inline-block"
                     >
@@ -256,19 +288,86 @@ export default function Home() {
                     {result.quote}
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  {result.timeline && (
+                    <div className="mb-8 text-left bg-gradient-to-br from-slate-50 to-white p-6 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                      <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                        <Sparkles className="w-24 h-24 text-rose-500" />
+                      </div>
+                      
+                      <div className="flex items-center gap-2 mb-6 relative z-10">
+                        <div className="bg-rose-100 p-2 rounded-full">
+                          <Sparkles className="w-4 h-4 text-rose-500" />
+                        </div>
+                        <h3 className="font-bold text-slate-800 text-lg uppercase tracking-wide">{result.timeline.title}</h3>
+                      </div>
+                      
+                      <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[1.125rem] before:h-full before:w-0.5 before:bg-rose-100 z-10">
+                        {result.timeline.steps.map((step, idx) => (
+                          <motion.div 
+                            key={idx}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.5 + idx * 0.2 }}
+                            className="relative flex items-start gap-4"
+                          >
+                            <div className="flex items-center justify-center w-9 h-9 rounded-full border-4 border-white bg-gradient-to-br from-rose-400 to-orange-400 text-white shadow-sm shrink-0 z-10 text-sm font-bold mt-[-4px]">
+                              {idx + 1}
+                            </div>
+                            <div className="bg-white border border-slate-100 shadow-sm p-4 rounded-2xl flex-1 mt-[-8px]">
+                              <p className="text-sm font-medium text-slate-700 leading-relaxed">{step}</p>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.2 }}
+                        className="mt-8 bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-100/50 p-5 rounded-2xl flex gap-4 items-start relative z-10"
+                      >
+                        <div className="bg-white p-2.5 rounded-full shrink-0 shadow-sm border border-rose-100/50">
+                          <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-bold uppercase tracking-widest text-rose-500 mb-1.5">Suggestion from LIK</p>
+                          <p className="text-sm font-semibold text-slate-700 leading-relaxed">{result.timeline.suggestion}</p>
+                        </div>
+                      </motion.div>
+                    </div>
+                  )}
+                  </div>
+
+                  <div className="space-y-4 relative z-20">
                     <button
-                      onClick={handleShare}
-                      className="flex-1 py-4 px-6 rounded-2xl bg-slate-900 text-white font-bold text-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-slate-200"
+                      onClick={handleDownload}
+                      disabled={isDownloading}
+                      className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-rose-500 to-orange-500 text-white font-bold text-lg hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-rose-200 shadow-lg"
                     >
-                      <Share2 className="w-5 h-5" /> Share Result
+                      {isDownloading ? (
+                        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
+                          <Star className="w-5 h-5" />
+                        </motion.div>
+                      ) : (
+                        <Download className="w-5 h-5" />
+                      )}
+                      {isDownloading ? 'Saving Match...' : 'Download Match Certificate'}
                     </button>
-                    <button
-                      onClick={resetForm}
-                      className="flex-1 py-4 px-6 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 font-bold text-lg hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <RotateCcw className="w-5 h-5" /> Try Another
-                    </button>
+                    
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <button
+                        onClick={handleShare}
+                        className="flex-1 py-4 px-6 rounded-2xl bg-slate-900 text-white font-bold text-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-slate-200"
+                      >
+                        <Share2 className="w-5 h-5" /> Share Link
+                      </button>
+                      <button
+                        onClick={resetForm}
+                        className="flex-1 py-4 px-6 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 font-bold text-lg hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <RotateCcw className="w-5 h-5" /> Try Another
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
