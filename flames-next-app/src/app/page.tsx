@@ -21,7 +21,7 @@ export default function Home() {
       setError('Names must be at least 2 characters long.');
       return;
     }
-    
+
     setLoading(true);
     setError('');
     setResult(null);
@@ -52,10 +52,10 @@ export default function Home() {
   };
 
   const triggerConfetti = (resultType: string) => {
-    const colors = resultType === 'Love' || resultType === 'Marriage' 
+    const colors = resultType === 'Love' || resultType === 'Marriage'
       ? ['#e11d48', '#f43f5e', '#ffb3c6'] // Pinks/Reds
       : ['#3b82f6', '#10b981', '#f59e0b']; // Mixed
-    
+
     confetti({
       particleCount: 100,
       spread: 70,
@@ -66,9 +66,9 @@ export default function Home() {
 
   const handleShare = async () => {
     if (!result) return;
-    
+
     const text = `I got "${result.result}" for ${name1} & ${name2} on the LIK Match Checker! Our Love Meter is ${result.percentage}% ❤️ Check yours now!`;
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -101,7 +101,7 @@ export default function Home() {
 
       <main className="max-w-4xl mx-auto px-4 pt-16 relative z-10">
         <header className="text-center mb-12">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, type: 'spring' }}
@@ -110,8 +110,8 @@ export default function Home() {
             <Sparkles className="text-orange-500 w-5 h-5" />
             <span className="font-semibold text-sm text-slate-700 tracking-wide uppercase">Relationship Destiny</span>
           </motion.div>
-          
-          <motion.h1 
+
+          <motion.h1
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -119,8 +119,8 @@ export default function Home() {
           >
             Check Your LIK Match
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -128,7 +128,7 @@ export default function Home() {
           >
             Enter two names to discover your fun relationship result. Are you destined for love, or just chaotic sibling energy?
           </motion.p>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -143,7 +143,7 @@ export default function Home() {
 
         <div className="max-w-xl mx-auto">
           {!result && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -221,10 +221,10 @@ export default function Home() {
                       <Heart className="w-6 h-6 text-rose-500 fill-rose-500" />
                       <span className="capitalize">{name2}</span>
                     </div>
-                    
-                    <motion.div 
-                      initial={{ scale: 0 }} 
-                      animate={{ scale: 1 }} 
+
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
                       transition={{ delay: 0.3, type: 'spring' }}
                       className="inline-block"
                     >
