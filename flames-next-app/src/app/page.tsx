@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Heart, Sparkles, Share2, RotateCcw, ShieldCheck, Star } from 'lucide-react';
+import { Heart, Sparkles, Share2, RotateCcw, Star } from 'lucide-react';
 import type { FlamesData } from '@/lib/flamesCalculator';
 
 export default function Home() {
@@ -265,12 +265,7 @@ export default function Home() {
           </AnimatePresence>
         </div>
 
-        <div className="mt-24 pb-8 flex flex-col items-center gap-4">
-          <div className="flex items-center gap-2 text-slate-500 text-sm font-medium bg-white/60 px-4 py-2 rounded-full border border-slate-200">
-            <ShieldCheck className="w-4 h-4 text-green-500" />
-            <p>100% Private. We don't share your results publicly.</p>
-          </div>
-        </div>
+
       </main>
     </div>
   );
