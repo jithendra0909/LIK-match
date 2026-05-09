@@ -4,7 +4,6 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { Heart, Sparkles, Share2, RotateCcw, Star, Download } from 'lucide-react';
-import { toPng } from 'html-to-image';
 import type { FlamesData } from '@/lib/flamesCalculator';
 
 export default function Home() {
@@ -94,6 +93,7 @@ export default function Home() {
 
     setIsDownloading(true);
     try {
+      const { toPng } = await import('html-to-image');
       const dataUrl = await toPng(exportRef.current, {
         quality: 0.95,
         backgroundColor: '#ffffff',
