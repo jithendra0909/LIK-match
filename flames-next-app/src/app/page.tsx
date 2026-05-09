@@ -128,6 +128,17 @@ export default function Home() {
           >
             Enter two names to discover your fun relationship result. Are you destined for love, or just chaotic sibling energy?
           </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-6 inline-flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full bg-rose-50 border border-rose-100 shadow-sm"
+          >
+            <span className="text-sm font-medium text-slate-500">Made by</span>
+            <span className="text-sm font-bold text-rose-500 tracking-wide">AI-1 Students</span>
+            <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+          </motion.div>
         </header>
 
         <div className="max-w-xl mx-auto">
@@ -145,7 +156,7 @@ export default function Home() {
                     type="text"
                     value={name1}
                     onChange={(e) => setName1(e.target.value)}
-                    placeholder="E.g. Taylor"
+                    placeholder="E.g. Romeo"
                     className="w-full px-5 py-4 rounded-2xl bg-white/50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white transition-all text-lg font-medium placeholder-slate-400 shadow-sm"
                     maxLength={30}
                   />
@@ -163,7 +174,7 @@ export default function Home() {
                     type="text"
                     value={name2}
                     onChange={(e) => setName2(e.target.value)}
-                    placeholder="E.g. Travis"
+                    placeholder="E.g. Juliet"
                     className="w-full px-5 py-4 rounded-2xl bg-white/50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white transition-all text-lg font-medium placeholder-slate-400 shadow-sm"
                     maxLength={30}
                   />
@@ -231,12 +242,12 @@ export default function Home() {
                       <p className="text-sm text-slate-500 font-semibold mb-1">Love Meter</p>
                       <p className="text-3xl font-bold text-rose-600">{result.percentage}%</p>
                     </div>
-                    <div className="bg-orange-50/50 rounded-2xl p-4 text-center border border-orange-100">
-                      <p className="text-sm text-slate-500 font-semibold mb-1">Movie Match</p>
+                    <div className="bg-orange-50/50 rounded-2xl p-4 text-center border border-orange-100 flex flex-col justify-center">
+                      <p className="text-sm text-slate-500 font-semibold mb-1">Must-Watch Movie</p>
                       <p className="text-lg font-bold text-orange-600 leading-tight flex items-center justify-center h-full pb-1">{result.movieMatch}</p>
                     </div>
                     <div className="col-span-2 bg-slate-50/80 rounded-2xl p-5 text-center border border-slate-100">
-                      <p className="text-sm text-slate-500 font-semibold mb-2">Couple Nickname</p>
+                      <p className="text-sm text-slate-500 font-semibold mb-2">{result.nicknameTitle}</p>
                       <p className="text-2xl font-bold text-slate-800">✨ {result.nickname} ✨</p>
                     </div>
                   </div>
@@ -264,8 +275,6 @@ export default function Home() {
             )}
           </AnimatePresence>
         </div>
-
-
       </main>
     </div>
   );
