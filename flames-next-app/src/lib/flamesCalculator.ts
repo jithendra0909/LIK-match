@@ -172,54 +172,63 @@ const QUOTES: Record<FlamesResultType, string[]> = {
   ]
 };
 
+const PERFECT_LOVE_PAIRS = new Set([
+  'jaswanth+madhu',
+  'jaswanth+madhushalini',
+  'romeo+juliet',
+  'jack+rose',
+  'mickey+minnie',
+  'virat+anushka',
+]);
+
 export function calculateFlames(name1: string, name2: string): FlamesData {
-  // 1. Normalize strings: lowercase, remove spaces and non-alphabet chars
+  // 1. Normalize strings
   const n1 = name1.toLowerCase().replace(/[^a-z]/g, '');
   const n2 = name2.toLowerCase().replace(/[^a-z]/g, '');
 
-  // 2. Remove common letters
-  let arr1 = n1.split('');
-  let arr2 = n2.split('');
+  // 2. Symmetric pair key
+  const pairKey = [n1, n2].sort().join('+');
 
-  for (let i = 0; i < arr1.length; i++) {
-    for (let j = 0; j < arr2.length; j++) {
-      if (arr1[i] === arr2[j] && arr1[i] !== '') {
-        arr1[i] = '';
-        arr2[j] = '';
-        break; // Only remove one matching instance
-      }
-    }
-  }
+  // 3. Perfect couple check
+  const isPerfectLovePair = PERFECT_LOVE_PAIRS.has(pairKey);
 
-  // 3. Count remaining letters
-  const remainingCount = arr1.filter(Boolean).length + arr2.filter(Boolean).length;
+  // 4. Stable hash generation
+  const combinedNames = pairKey.replace('+', '');
 
-  // 4. Eliminate letters from FLAMES
-  let flamesArr = ['F', 'L', 'A', 'M', 'E', 'S'];
-  let index = 0;
-
-  if (remainingCount > 0) {
-    while (flamesArr.length > 1) {
-      index = (index + remainingCount - 1) % flamesArr.length;
-      flamesArr.splice(index, 1);
-    }
-  }
-
-  const resultLetter = flamesArr[0];
-  const resultType = FLAMES_MAPPING[resultLetter];
-
-  // 5. Generate deterministic love percentage and index
-  const combinedNames = [n1, n2].sort().join('');
   let hash = 0;
   for (let i = 0; i < combinedNames.length; i++) {
     hash = (hash << 5) - hash + combinedNames.charCodeAt(i);
-    hash |= 0; 
+    hash |= 0;
   }
-  
-  const percentage = (Math.abs(hash) % 51) + 50; // 50-100
-  
-  // Pick an index from 0 to 19 deterministically
-  const listIndex = Math.abs(hash) % 20;
+
+  const absHash = Math.abs(hash);
+
+  // 5. Percentage always between 70 and 100
+  let percentage = (absHash % 31) + 70;
+
+  // 6. Positive-only result logic
+  let resultType: FlamesResultType;
+
+  if (percentage >= 95) {
+    resultType = 'Love';
+  } else if (percentage >= 88) {
+    resultType = 'Marriage';
+  } else if (percentage >= 80) {
+    resultType = 'Love';
+  } else if (percentage >= 74) {
+    resultType = 'Affection';
+  } else {
+    resultType = 'Friends';
+  }
+
+  // 7. Guaranteed couples
+  if (isPerfectLovePair) {
+    resultType = 'Love';
+    percentage = 100;
+  }
+
+  // 8. Stable list index
+  const listIndex = absHash % 20;
 
   return {
     result: resultType,
