@@ -5,8 +5,8 @@ import './globals.css';
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 
 export const metadata: Metadata = {
-  title: 'LIK Match Checker | Discover Your Relationship Destiny',
-  description: 'Enter two names and check your LIK relationship result. Friends, Love, Affection, Marriage, Enemy, or Siblings?',
+  title: 'LIK Match Checker | Made by AI-1 Students',
+  description: 'Enter two names and check your LIK relationship result. Friends, Love, Affection, Marriage, Enemy, or Siblings? Made by AI-1 Students.',
 };
 
 export default function RootLayout({
@@ -22,3 +22,4 @@ export default function RootLayout({
     </html>
   );
 }
+
