@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Heart, Sparkles, Share2, RotateCcw, Star, Download } from 'lucide-react';
+import { Heart, Sparkles, Share2, RotateCcw, Star } from 'lucide-react';
 import type { FlamesData } from '@/lib/flamesCalculator';
 
 export default function Home() {
@@ -12,10 +12,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FlamesData | null>(null);
   const [error, setError] = useState('');
-  const [isDownloading, setIsDownloading] = useState(false);
 
   const resultRef = useRef<HTMLDivElement>(null);
-  const exportRef = useRef<HTMLDivElement>(null);
 
   const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,35 +83,6 @@ export default function Home() {
       // Fallback to clipboard
       navigator.clipboard.writeText(`${text} ${window.location.href}`);
       alert('Result copied to clipboard!');
-    }
-  };
-
-  const handleDownload = async () => {
-    if (!exportRef.current) return;
-
-    setIsDownloading(true);
-    try {
-      const { toPng } = await import('html-to-image');
-      const dataUrl = await toPng(exportRef.current, {
-        quality: 0.95,
-        backgroundColor: '#ffffff',
-        style: {
-          padding: '2rem',
-          borderRadius: '2rem',
-          margin: '0',
-          boxShadow: 'none',
-        }
-      });
-
-      const link = document.createElement('a');
-      link.download = `LIK-Match-${name1}-${name2}.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error('Error downloading image:', err);
-      alert('Failed to download image. Please try again.');
-    } finally {
-      setIsDownloading(false);
     }
   };
 
@@ -245,8 +214,7 @@ export default function Home() {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-orange-400 transform scale-[1.03] rounded-[2rem] blur-xl opacity-30 animate-pulse"></div>
                 <div className="glass-card rounded-[2rem] p-8 relative overflow-hidden bg-white/80">
-                  <div ref={exportRef} className="relative z-10 -m-8 p-8 pb-4 mb-4 md:m-0 md:p-0 md:pb-8 md:mb-8 md:bg-transparent">
-                    <div className="text-center mb-8">
+                  <div className="text-center mb-8">
                       <p className="text-slate-500 font-medium mb-2 uppercase tracking-widest text-sm">The Result is in</p>
                       <div className="flex items-center justify-center gap-4 text-2xl font-bold text-slate-800 mb-6">
                         <span className="capitalize">{name1}</span>
@@ -338,36 +306,19 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="space-y-4 relative z-20">
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <button
-                      onClick={handleDownload}
-                      disabled={isDownloading}
-                      className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-rose-500 to-orange-500 text-white font-bold text-lg hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-rose-200 shadow-lg"
+                      onClick={handleShare}
+                      className="flex-1 py-4 px-6 rounded-2xl bg-slate-900 text-white font-bold text-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-slate-200"
                     >
-                      {isDownloading ? (
-                        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
-                          <Star className="w-5 h-5" />
-                        </motion.div>
-                      ) : (
-                        <Download className="w-5 h-5" />
-                      )}
-                      {isDownloading ? 'Saving Match...' : 'Download Match Certificate'}
+                      <Share2 className="w-5 h-5" /> Share Result
                     </button>
-
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <button
-                        onClick={handleShare}
-                        className="flex-1 py-4 px-6 rounded-2xl bg-slate-900 text-white font-bold text-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-slate-200"
-                      >
-                        <Share2 className="w-5 h-5" /> Share Link
-                      </button>
-                      <button
-                        onClick={resetForm}
-                        className="flex-1 py-4 px-6 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 font-bold text-lg hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-                      >
-                        <RotateCcw className="w-5 h-5" /> Try Another
-                      </button>
-                    </div>
+                    <button
+                      onClick={resetForm}
+                      className="flex-1 py-4 px-6 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 font-bold text-lg hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <RotateCcw className="w-5 h-5" /> Try Another
+                    </button>
                   </div>
                 </div>
               </motion.div>
