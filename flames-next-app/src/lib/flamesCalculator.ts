@@ -1,3 +1,5 @@
+import { TIMELINES, TimelineData } from './timelines';
+
 export type FlamesResultType = 'Friends' | 'Love' | 'Affection' | 'Marriage' | 'Enemy' | 'Siblings';
 
 export interface FlamesData {
@@ -8,6 +10,7 @@ export interface FlamesData {
   nicknameTitle: string;
   nickname: string;
   quote: string;
+  timeline?: TimelineData;
 }
 
 const FLAMES_MAPPING: Record<string, FlamesResultType> = {
@@ -238,5 +241,6 @@ export function calculateFlames(name1: string, name2: string): FlamesData {
     nicknameTitle: NICKNAME_LABELS[resultType],
     nickname: NICKNAMES[resultType][listIndex],
     quote: QUOTES[resultType][listIndex],
+    timeline: TIMELINES[resultType]?.[listIndex],
   };
 }
