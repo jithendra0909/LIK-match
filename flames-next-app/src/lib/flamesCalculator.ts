@@ -206,22 +206,23 @@ export function calculateFlames(name1: string, name2: string): FlamesData {
 
   const absHash = Math.abs(hash);
 
-  // 5. Percentage always between 70 and 100
-  let percentage = (absHash % 31) + 70;
+  // 5. Determine percentage and result logic using 1-100 distribution
+  let percentage = (absHash % 100) + 1;
 
-  // 6. Positive-only result logic
   let resultType: FlamesResultType;
 
-  if (percentage >= 95) {
-    resultType = 'Love';
-  } else if (percentage >= 88) {
-    resultType = 'Marriage';
-  } else if (percentage >= 80) {
-    resultType = 'Love';
-  } else if (percentage >= 74) {
-    resultType = 'Affection';
+  if (percentage <= 18) {
+    resultType = 'Enemy'; // 18%
+  } else if (percentage <= 36) {
+    resultType = 'Siblings'; // 18%
+  } else if (percentage <= 53) {
+    resultType = 'Friends'; // 17%
+  } else if (percentage <= 68) {
+    resultType = 'Affection'; // 15%
+  } else if (percentage <= 85) {
+    resultType = 'Marriage'; // 17%
   } else {
-    resultType = 'Friends';
+    resultType = 'Love'; // 15%
   }
 
   // 7. Guaranteed couples
