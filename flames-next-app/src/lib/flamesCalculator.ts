@@ -182,7 +182,7 @@ const PERFECT_LOVE_PAIRS = new Set([
   'jaswanth+srija',
   'jaswanth+manvitha',
   'mahesh+juniya',
-  'charan praneeth+kanishka'
+  'charan praneeth+kanishka',
   'rashmitha+nishanth',
   'jaswanth+madhushalini',
   'romeo+juliet',
