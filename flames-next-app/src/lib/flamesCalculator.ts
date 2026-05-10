@@ -184,7 +184,11 @@ const PERFECT_LOVE_PAIRS = new Set([
   'virat+anushka',
 ]);
 
-export function calculateFlames(name1: string, name2: string): FlamesData {
+export function calculateFlames(
+  name1: string, 
+  name2: string,
+  forcedResult?: FlamesResultType
+): FlamesData {
   // 1. Normalize strings
   const n1 = name1.toLowerCase().replace(/[^a-z]/g, '');
   const n2 = name2.toLowerCase().replace(/[^a-z]/g, '');
@@ -206,23 +210,38 @@ export function calculateFlames(name1: string, name2: string): FlamesData {
 
   const absHash = Math.abs(hash);
 
-  // 5. Determine percentage and result logic using 1-100 distribution
-  let percentage = (absHash % 100) + 1;
-
   let resultType: FlamesResultType;
+  let percentage: number;
 
-  if (percentage <= 18) {
-    resultType = 'Enemy'; // 18%
-  } else if (percentage <= 36) {
-    resultType = 'Siblings'; // 18%
-  } else if (percentage <= 53) {
-    resultType = 'Friends'; // 17%
-  } else if (percentage <= 68) {
-    resultType = 'Affection'; // 15%
-  } else if (percentage <= 85) {
-    resultType = 'Marriage'; // 17%
+  if (forcedResult) {
+    resultType = forcedResult;
+    const bounds = {
+      'Enemy': [1, 18],
+      'Siblings': [19, 36],
+      'Friends': [37, 53],
+      'Affection': [54, 68],
+      'Marriage': [69, 85],
+      'Love': [86, 100],
+    };
+    const [min, max] = bounds[resultType];
+    percentage = min + (absHash % (max - min + 1));
   } else {
-    resultType = 'Love'; // 15%
+    // 5. Determine percentage and result logic using 1-100 distribution
+    percentage = (absHash % 100) + 1;
+
+    if (percentage <= 18) {
+      resultType = 'Enemy'; // 18%
+    } else if (percentage <= 36) {
+      resultType = 'Siblings'; // 18%
+    } else if (percentage <= 53) {
+      resultType = 'Friends'; // 17%
+    } else if (percentage <= 68) {
+      resultType = 'Affection'; // 15%
+    } else if (percentage <= 85) {
+      resultType = 'Marriage'; // 17%
+    } else {
+      resultType = 'Love'; // 15%
+    }
   }
 
   // 7. Guaranteed couples

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { calculateFlames } from '@/lib/flamesCalculator';
+import { calculateFlames, FlamesResultType } from '@/lib/flamesCalculator';
 import prisma from '@/lib/prisma';
 
 export const runtime = 'nodejs';
@@ -20,10 +20,64 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Names can only contain letters and spaces.' }, { status: 400 });
     }
 
-    const flamesData = calculateFlames(name1, name2);
-
     const normalizedFirstName = name1.toLowerCase().replace(/[^a-z]/g, '');
     const normalizedSecondName = name2.toLowerCase().replace(/[^a-z]/g, '');
+
+    // 1. Check if this pair already exists (order-independent)
+    const existing = await prisma.submission.findFirst({
+      where: {
+        OR: [
+          { normalizedFirstName, normalizedSecondName },
+          { normalizedFirstName: normalizedSecondName, normalizedSecondName: normalizedFirstName }
+        ]
+      }
+    });
+
+    let flamesData;
+
+    if (existing) {
+      // Return cached result, forcing the outcome and fixing the percentage
+      flamesData = calculateFlames(name1, name2, existing.flamesResult as FlamesResultType);
+      flamesData.percentage = existing.lovePercentage;
+    } else {
+      // 2. Count unique pairs to determine global cycle index
+      const allSubs = await prisma.submission.findMany({
+        select: { normalizedFirstName: true, normalizedSecondName: true }
+      });
+      const uniquePairs = new Set(
+        allSubs.map(s => [s.normalizedFirstName, s.normalizedSecondName].sort().join('-'))
+      );
+      const uniqueCount = uniquePairs.size;
+
+      // 3. Determine the result for this new unique pair
+      const cycleBlock = Math.floor(uniqueCount / 5);
+      const cycleIndex = uniqueCount % 5;
+
+      let determinedResult: FlamesResultType;
+
+      if (cycleIndex === 4) {
+        // 5th time is negative (alternating)
+        determinedResult = cycleBlock % 2 === 0 ? 'Siblings' : 'Enemy';
+      } else {
+        // 1st to 4th time are the 4 positives in a seeded shuffled order
+        const positives: FlamesResultType[] = ['Friends', 'Love', 'Affection', 'Marriage'];
+        
+        let seed = cycleBlock + 12345;
+        const random = () => {
+          seed = (seed * 9301 + 49297) % 233280;
+          return seed / 233280;
+        };
+
+        for (let i = positives.length - 1; i > 0; i--) {
+          const j = Math.floor(random() * (i + 1));
+          [positives[i], positives[j]] = [positives[j], positives[i]];
+        }
+        
+        determinedResult = positives[cycleIndex];
+      }
+
+      flamesData = calculateFlames(name1, name2, determinedResult);
+    }
 
     // Get basic user info if possible (optional)
     const ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '';
@@ -41,7 +95,7 @@ export async function POST(req: Request) {
         lovePercentage: flamesData.percentage,
         movieMatch: flamesData.movieMatch,
         cuteNickname: flamesData.nickname,
-        userMessage: 'Checked from frontend',
+        userMessage: existing ? 'Checked existing pair' : 'Checked new pair',
         ipAddress: ipAddress.substring(0, 45), // truncate if too long
         userAgent: userAgent.substring(0, 255), // truncate if too long
       },
