@@ -177,6 +177,13 @@ const QUOTES: Record<FlamesResultType, string[]> = {
 
 const PERFECT_LOVE_PAIRS = new Set([
   'jaswanth+madhu',
+  'jaswanth+sudha',
+  'jaswanth+rishitha',
+  'jaswanth+srija',
+  'jaswanth+manvitha',
+  'mahesh+juniya',
+  'charan praneeth+kanishka'
+  'rashmitha+nishanth',
   'jaswanth+madhushalini',
   'romeo+juliet',
   'jack+rose',
