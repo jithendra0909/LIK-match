@@ -93,7 +93,7 @@ export async function POST(req: Request) {
         flamesResult: flamesData.result,
         resultMeaning: flamesData.meaning,
         lovePercentage: flamesData.percentage,
-        movieMatch: flamesData.movieMatch,
+        movieMatch: flamesData.songMatch,
         cuteNickname: flamesData.nickname,
         userMessage: existing ? 'Checked existing pair' : 'Checked new pair',
         ipAddress: ipAddress.substring(0, 45), // truncate if too long
