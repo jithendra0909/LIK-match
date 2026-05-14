@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Heart, Sparkles, Share2, RotateCcw, Star, Download } from 'lucide-react';
+import { Heart, Sparkles, Share2, RotateCcw, Star, Download, Music } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import type { FlamesData } from '@/lib/flamesCalculator';
 
@@ -264,9 +264,25 @@ export default function Home() {
                         <p className="text-sm text-slate-500 dark:text-slate-400 font-semibold mb-1">Love Meter</p>
                         <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">{result.percentage}%</p>
                       </div>
-                      <div className="bg-orange-50/50 dark:bg-orange-900/10 rounded-2xl p-4 text-center border border-orange-100 dark:border-orange-900/30 flex flex-col justify-center">
-                        <p className="text-sm text-slate-500 dark:text-slate-400 font-semibold mb-1">Must-Watch Movie</p>
-                        <p className="text-lg font-bold text-orange-600 dark:text-orange-400 leading-tight flex items-center justify-center h-full pb-1">{result.movieMatch}</p>
+                      <div className="bg-orange-50/50 dark:bg-orange-900/10 rounded-2xl p-4 text-center border border-orange-100 dark:border-orange-900/30 flex flex-col justify-center relative group">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 font-semibold mb-1">Theme Song</p>
+                        <p className="text-sm font-bold text-orange-600 dark:text-orange-400 leading-tight flex items-center justify-center h-full pb-1">{result.songMatch}</p>
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-orange-500/10 rounded-2xl cursor-pointer"
+                             onClick={() => {
+                               const iframe = document.getElementById('youtube-player') as HTMLIFrameElement;
+                               if (iframe) {
+                                 const startParam = result.startTime ? `&start=${result.startTime}` : '';
+                                 iframe.src = `https://www.youtube.com/embed/${result.youtubeId}?autoplay=1&controls=1${startParam}`;
+                               }
+                             }}>
+                          <Music className="w-6 h-6 text-orange-600" />
+                        </div>
+                        <iframe 
+                          id="youtube-player"
+                          src={`https://www.youtube.com/embed/${result.youtubeId}?autoplay=1&mute=0&enablejsapi=1${result.startTime ? `&start=${result.startTime}` : ''}`} 
+                          allow="autoplay" 
+                          className="w-0 h-0 opacity-0 absolute"
+                        />
                       </div>
                       <div className="col-span-2 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl p-5 text-center border border-slate-100 dark:border-slate-700/50">
                         <p className="text-sm text-slate-500 dark:text-slate-400 font-semibold mb-2">{result.nicknameTitle}</p>

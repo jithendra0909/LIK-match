@@ -5,7 +5,9 @@ export type FlamesResultType = 'Friends' | 'Love' | 'Affection' | 'Marriage' | '
 export interface FlamesData {
   result: FlamesResultType;
   meaning: string;
-  movieMatch: string;
+  songMatch: string;
+  youtubeId: string;
+  startTime?: number;
   percentage: number;
   nicknameTitle: string;
   nickname: string;
@@ -31,42 +33,138 @@ const FLAMES_MEANINGS: Record<FlamesResultType, string> = {
   Siblings: 'This feels like chaotic sibling energy.',
 };
 
-const MOVIE_MATCHES: Record<FlamesResultType, string[]> = {
+const SONG_MATCHES: Record<FlamesResultType, { title: string; id: string; startTime?: number }[]> = {
   Friends: [
-    'Oh My Friend', 'Happy Days', 'Ee Nagaraniki Emaindhi', 'MAD', 'Jathi Ratnalu',
-    '3 Idiots', 'Zindagi Na Milegi Dobara', 'Chhichhore', 'Superbad', 'The Hangover',
-    'Brochevarevarura', 'Sneham Kosam', 'Snehituda', 'Yevade Subramanyam', 'Hostel Daze',
-    'Project X', 'Stand By Me', 'Toy Story', 'Dil Chahta Hai', 'Jersey'
+    { "title": "Friendship Anthem – Happy Days", "id": "aj5FiHBrn04", "startTime": 15 },
+    { "title": "O My Friend – Happy Days", "id": "wzUKUxpdsvk" },
+    { "title": "Chalore Chalore – Jalsa", "id": "cQpe2HMkqVA" },
+    { "title": "Life Is Beautiful – Life Is Beautiful", "id": "W_5w2jXJd1E" },
+    { "title": "Memu Vayasuku Vacham – Happy Days", "id": "FUUeBvU1HRs" },
+    { "title": "Freedom – Yevade Subramanyam", "id": "nX0Gfnzilok" },
+    { "title": "College Bulloda – 3 Idiots Telugu", "id": "3HyOlbz6xFQ" },
+    { "title": "Oo Madhu – Julayi", "id": "mP3A6Y5Yp8M" },
+    { "title": "Vellipomaake – Saahasam Swaasaga Saagipo", "id": "-GydnFPTgus" },
+    { "title": "Baitikochi Chuste – Agnyaathavaasi", "id": "UuiabjRSDs4" },
+    { "title": "Adento Gaani – Jersey", "id": "l2GJB-kvnww" },
+    { "title": "Sailaja Sailaja – Nenu Sailaja", "id": "hgpNla8AkIQ" },
+    { "title": "Nee Prashnalu – Kotha Bangaru Lokam", "id": "9RbQwW1B9AI" },
+    { "title": "Chitti Adugu – Most Eligible Bachelor", "id": "E08M8gPzzNk" },
+    { "title": "Pareshanura – Dhruva", "id": "n42iRfYAkUY" },
+    { "title": "Chukkallo Chandrude – Nuvvostanante Nenoddantana", "id": "RIriENOmOpo" },
+    { "title": "Nammavemo Gani – Parugu", "id": "FM7wLLzTNhE" },
+    { "title": "Yaaron Annadi – Student No.1", "id": "m4aHFKIVjSo" },
+    { "title": "Vachadayyo Saami – Bharat Ane Nenu", "id": "ks--VOnxCXY" },
+    { "title": "Yevvaro – Bodyguard", "id": "uV493v0FBdM" }
   ],
   Love: [
-    'Titanic', 'Geetha Govindam', 'Fidaa', 'Arjun Reddy', 'Sita Ramam',
-    'Hi Nanna', 'Ye Maaya Chesave', 'Majili', 'Alaipayuthey', 'Love Story',
-    'Romeo Juliet', 'The Notebook', 'La La Land', 'Twilight', 'A Walk to Remember',
-    'Dear Comrade', 'Orange', '96', 'Radhe Shyam', 'Darling'
+    { "title": "Samajavaragamana – Ala Vaikunthapurramuloo", "id": "OCg6BWlAXSw", "startTime": 10 },
+    { "title": "Inkem Inkem Inkem Kaavaale – Geetha Govindam", "id": "LPeZOE8ZIHI" },
+    { "title": "Oh Sita Hey Rama – Sita Ramam", "id": "hYFzyK9ExuM" },
+    { "title": "Nee Kannu Neeli Samudram – Uppena", "id": "zZl7vDDN8Ek" },
+    { "title": "Adiga Adiga – Ninnu Kori", "id": "evbYFsSJ4pU" },
+    { "title": "Kadalalle – Dear Comrade", "id": "2ySr4lR0XFg" },
+    { "title": "Maate Vinadhuga – Taxiwaala", "id": "kca0cG9fiQw" },
+    { "title": "Nee Neeli Kannullona – Dear Comrade", "id": "JgZBAnKIvms" },
+    { "title": "Priyathama Priyathama – Majili", "id": "BpINyS4k7Uw" },
+    { "title": "Vintunnava – Ye Maaya Chesave", "id": "Wbs6pPJgBnA" },
+    { "title": "Evo Evo Kalale – Love Story", "id": "05HYHpDKR2k" },
+    { "title": "Undiporaadhey – Hushaaru", "id": "jlmyZ_x5vjc" },
+    { "title": "Na Roja Nuvve – Kushi", "id": "JTpDCoxZdv8" },
+    { "title": "Sirivennela – Shyam Singha Roy", "id": "m2kU2b9PYcs" },
+    { "title": "Chiru Chiru – Awara", "id": "hCt-H4-5wco" },
+    { "title": "Em Sandeham Ledu – Oohalu Gusagusalade", "id": "DDb7OILQMMA" },
+    { "title": "Neeli Neeli Aakasam – 30 Rojullo Preminchadam Ela", "id": "0nRazWwoUbY" },
+    { "title": "Naa Kosam – Bangarraju", "id": "TaQk5myCk00" },
+    { "title": "Yenti Yenti – Geetha Govindam", "id": "LOZNKZfiFUw" },
+    { "title": "Ye Mantramo – Andala Rakshasi", "id": "WE_k7v8QTXo" }
   ],
   Affection: [
-    'Bommarillu', 'Little Manhattan', 'Minions', 'Frozen', 'Zootopia',
-    'Coco', 'Finding Nemo', 'Up', 'Inside Out', 'Baby’s Day Out',
-    'Krishna and His Leela', 'Ante Sundaraniki', 'Oh Baby', 'Miss Shetty Mr Polishetty', 'Kushi',
-    'Pelli Choopulu', 'Luca', 'Tangled', 'Wall-E', 'Charlie Brown'
+    { "title": "Butta Bomma – Ala Vaikunthapurramuloo", "id": "YO7rue3nKX0", "startTime": 12 },
+    { "title": "Chitti – Jathi Ratnalu", "id": "uvCbZxYdLuU" },
+    { "title": "Darlingey – Mirchi", "id": "5jDWeo2HHx8" },
+    { "title": "Oh Baby – Oh Baby", "id": "19QqXTmH0HM" },
+    { "title": "Ammaye Sannaga – Kushi", "id": "QaYHchDvLiY" },
+    { "title": "Choosi Chudangane – Chalo", "id": "3smrEURoJcM" },
+    { "title": "Vachindamma – Geetha Govindam", "id": "I8t0VJjEffk" },
+    { "title": "Chilipiga – Orange", "id": "vKjtupJz0r4" },
+    { "title": "Kanulanu Thaake – Manam", "id": "F4gmDat38Rk" },
+    { "title": "Hello Rammante – Orange", "id": "a-Xn3q3yst8" },
+    { "title": "Manasa Manasa – Most Eligible Bachelor", "id": "NtTGqvD67pE" },
+    { "title": "Nee Valle Nee Valle – IVNR", "id": "nujmBIj0pv0" },
+    { "title": "Arerey Manasa – Falaknuma Das", "id": "Qf4MumY9fXk" },
+    { "title": "Bujji Bangaram – Guna 369", "id": "VQr7lvMCrOs" },
+    { "title": "Hrudayam Ekkadunnadi – Ghajini", "id": "zJfOpe7AXwc" },
+    { "title": "Mellaga Tellarindoi – Sathamanam Bhavati", "id": "e5T1gbGJuAc" },
+    { "title": "Niluvadhamu Ninu Epudaina – Nuvvostanante Nenoddantana", "id": "fdEzDqiSC3U" },
+    { "title": "Kallolam – Padi Padi Leche Manasu", "id": "uOtgJmJIsio" },
+    { "title": "Padi Padi Leche – Padi Padi Leche Manasu", "id": "fz9IDb2FV-0" },
+    { "title": "Smiley Smiley – Race Gurram", "id": "XZqy6nCij50" }
   ],
   Marriage: [
-    'Bommarillu', 'Seethamma Vakitlo Sirimalle Chettu', 'Mr. Perfect', 'Shatamanam Bhavati', 'F2',
-    'F3', 'Vivah', 'Hum Saath Saath Hain', 'Hum Aapke Hain Koun', 'The Vow',
-    'Marriage Story', 'Sreekaram', 'Govindudu Andarivadele', 'Varudu', 'Malliswari',
-    'Ninne Pelladatha', 'Ready', 'Bride Wars', 'Made for Each Other', 'Life As We Know It'
+    { "title": "Kalyanam Vaibhogam – Srinivasa Kalyanam", "id": "TqrPYfn1yUM", "startTime": 8 },
+    { "title": "Alanati Ramachandrudu – Murari", "id": "EO3JWdSL1mk" },
+    { "title": "Pelli Sandadi – Pelli Sandadi", "id": "1rZY5RjeuCw" },
+    { "title": "Mangalyam – Seetharama Kalyana", "id": "8sfzdytgh6M" },
+    { "title": "Sathamana Mannadile – Mruga Raju", "id": "Vf_0PZoJy3c" },
+    { "title": "Raarandoy Veduka Chuddam – Rarandoi Veduka Chudham", "id": "p9kCgQdy_VE" },
+    { "title": "Madhuram Madhuram – Brindavanam", "id": "Pk5dylSO8yk" },
+    { "title": "Kalyana Vaibhogame – Shubhamasthu", "id": "ZsAXhlLwIV4" },
+    { "title": "Seethakoka Chiluka – Son of Satyamurthy", "id": "k7326ZHbXZc" },
+    { "title": "Muvvala Navvakala – Pournami", "id": "AlZH_dPAskQ" },
+    { "title": "Siggestondi – SVSC", "id": "GhXU_FTKNbE" },
+    { "title": "Andamaina Premarani – Premikudu", "id": "T2tmlLojh3U" },
+    { "title": "Vennelave Vennelave – Merupu Kalalu", "id": "Cg_TCyO9FSc" },
+    { "title": "Chinnadana Neekosam – Chinnadana Neekosam", "id": "0lU35XkicU0" },
+    { "title": "O Prema – Upendra", "id": "x0X2ld8YZlM" },
+    { "title": "Nuvvem Maya Chesavo – Okkadu", "id": "2wwqmBaIL7c" },
+    { "title": "Sri Anjaneyam – Oka Laila Kosam", "id": "3wRLczXuesg" },
+    { "title": "Bhadram Be Careful – Money", "id": "bQLWjp0y5GE" },
+    { "title": "Aakasam Ammayaithe – Gabbar Singh", "id": "Xpl8RRT8_Y0" },
+    { "title": "Manohari – Baahubali", "id": "dXO5p6QRG7A" }
   ],
   Enemy: [
-    'Tom and Jerry', 'Baahubali 2', 'RRR', 'KGF', 'Pushpa',
-    'The Dark Knight', 'Batman vs Superman', 'Captain America: Civil War', 'Godzilla vs Kong', 'Race Gurram',
-    'Dookudu', 'Businessman', 'Pokiri', 'Leo', 'Vikram',
-    'Master', 'Avengers: Infinity War', 'Joker', 'Magadheera', 'Spyder'
+    { "title": "Pushpa Pushpa – Pushpa", "id": "wQksDYahKZs", "startTime": 10 },
+    { "title": "Daakko Daakko Meka – Pushpa", "id": "pc_784hcQxI" },
+    { "title": "Naatu Naatu – RRR", "id": "4_eEgJhsBMo" },
+    { "title": "Dum Masala – Guntur Kaaram", "id": "9w20rGRhek0" },
+    { "title": "Mind Block – Sarileru Neekevvaru", "id": "J7Qf8bQRPuc" },
+    { "title": "Blockbuster – Sarrainodu", "id": "FmjJ-e5uGuY" },
+    { "title": "Pakka Local – Janatha Garage", "id": "GFEj1vnhvxA" },
+    { "title": "Mass Mogudu – Veera Simha Reddy", "id": "rtTLi9Zts58" },
+    { "title": "Jai Balayya – Akhanda", "id": "HgWgOii3SmQ" },
+    { "title": "Adaradagottu – Teenmaar", "id": "LTGgJ0hYSF8" },
+    { "title": "Seeti Maar – DJ", "id": "WLD0kUKybeE" },
+    { "title": "Ammadu Let’s Do Kummudu – Khaidi No.150", "id": "JTIaespV8Ic" },
+    { "title": "Boss Party – Waltair Veerayya", "id": "Er8D49RPLCs" },
+    { "title": "Bullet Song – The Warriorr", "id": "WgrLE4Fqxeo" },
+    { "title": "Whistle Song – Guntur Kaaram", "id": "9w20rGRhek0" },
+    { "title": "Top Lesi Poddi – Iddarammayilatho", "id": "YAscOYMTgTs" },
+    { "title": "Ringa Ringa – Arya 2", "id": "2OhhFkF3MqQ" },
+    { "title": "Cinema Choopistha Mama – Race Gurram", "id": "H7EAJW8jYzA" },
+    { "title": "Ramuloo Ramulaa – Ala Vaikunthapurramuloo", "id": "Bg8Yb9zGYyA" },
+    { "title": "Saami Saami – Pushpa", "id": "-ZAnN6groJw" }
   ],
   Siblings: [
-    'Frozen', 'Hum Saath Saath Hain', 'Seethamma Vakitlo Sirimalle Chettu', 'Govindudu Andarivadele', 'Encanto',
-    'Little Women', 'Brother Bear', 'Raksha Bandhan', 'Bheemla Nayak', 'Bangarraju',
-    'Sankranthiki Vasthunam', 'Hello Brother', 'Annayya', 'Yamaleela', 'Muvva Gopaludu',
-    'Karthikeya 2', 'F2', 'Sky High', 'The Incredibles', 'Coco'
+    { "title": "Pedave Palikina – Nani", "id": "L5-6hW-3yWk", "startTime": 12 },
+    { "title": "Kanipenchina – Manam", "id": "J2Bt3sE8Gmo" },
+    { "title": "Amma Amma – Raghuvaran BTech", "id": "nS8xDHQ-r5E" },
+    { "title": "Chinni Chinni Aasalu – Manam", "id": "sStyIIjGhzI" },
+    { "title": "Aaradugula Bullet – Attarintiki Daredi", "id": "VWISgFcGM68" },
+    { "title": "Niluvaddam – Nuvvostanante Nenoddantana", "id": "fdEzDqiSC3U" },
+    { "title": "Janavule Nerajanavule – Aditya 369", "id": "JZ6EiyoCfsU" },
+    { "title": "Amma Song – Oke Oka Jeevitham", "id": "V-puu8Xg9sw" },
+    { "title": "Family Party – MCA", "id": "f6UmenpDkhc" },
+    { "title": "Bapu Gari Bommo – Attarintiki Daredi", "id": "v7L1JJrmKG0" },
+    { "title": "Chal Chal Gurram – Winner", "id": "jtj74-ZELls" },
+    { "title": "Okanoka Lokam – Sye", "id": "_PtH3QraTz0" },
+    { "title": "Chukkalanti Ammayi – Abhinandana", "id": "scroWg6OQ4Y" },
+    { "title": "Neeve Neeve – Darling", "id": "0Olv8zM_rps" },
+    { "title": "Yedo Priyaragam – Arya", "id": "Llw7cXHmDDo" },
+    { "title": "Amma Ani Kothaga – Life Is Beautiful", "id": "_7YQFAkHD6Y" },
+    { "title": "Laali Laali – Damarukam", "id": "5Ye82ny8qT4" },
+    { "title": "Gundello Godari – Gundello Godari", "id": "Wwr_yWq-4Ys" },
+    { "title": "Anandam Anandamaye – Murari", "id": "Wb8heGyScGM" },
+    { "title": "Vellipomaakey – Saahasam Swaasaga Saagipo", "id": "-GydnFPTgus" }
   ]
 };
 
@@ -177,13 +275,6 @@ const QUOTES: Record<FlamesResultType, string[]> = {
 
 const PERFECT_LOVE_PAIRS = new Set([
   'jaswanth+madhu',
-  'jaswanth+sudha',
-  'jaswanth+rishitha',
-  'jaswanth+srija',
-  'jaswanth+manvitha',
-  'mahesh+juniya',
-  'charan praneeth+kanishka',
-  'rashmitha+nishanth',
   'jaswanth+madhushalini',
   'romeo+juliet',
   'jack+rose',
@@ -259,11 +350,14 @@ export function calculateFlames(
 
   // 8. Stable list index
   const listIndex = absHash % 20;
+  const songData = SONG_MATCHES[resultType][listIndex];
 
   return {
     result: resultType,
     meaning: FLAMES_MEANINGS[resultType],
-    movieMatch: MOVIE_MATCHES[resultType][listIndex],
+    songMatch: songData.title,
+    youtubeId: songData.id,
+    startTime: songData.startTime,
     percentage,
     nicknameTitle: NICKNAME_LABELS[resultType],
     nickname: NICKNAMES[resultType][listIndex],
